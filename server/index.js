@@ -5,9 +5,8 @@ const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
+const nodemailer = require("nodemailer");
 
-// Contournement DNS necessaire seulement en local (certains FAI/box bloquent les requetes SRV).
-// Sur Render, le DNS interne fonctionne nativement avec MongoDB Atlas, donc on ne l'applique pas.
 if (!process.env.RENDER) {
   const dns = require("dns");
   dns.setServers(["8.8.8.8", "8.8.4.4"]);
@@ -15,6 +14,7 @@ if (!process.env.RENDER) {
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const SITE_URL = process.env.SITE_URL || "http://localhost:5173";
 
 app.use(cors());
 app.use(express.json());
@@ -24,6 +24,30 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connecte a MongoDB Atlas"))
   .catch((err) => console.error("Erreur de connexion MongoDB :", err.message));
+
+// ---- Envoi d'email (notifications admin) ----
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
+
+async function envoyerNotification(sujet, texte) {
+  try {
+    await transporter.sendMail({
+      from: `"YAMBA-TECH Site" <${process.env.GMAIL_USER}>`,
+      to: process.env.GMAIL_USER,
+      subject: sujet,
+      text: texte,
+    });
+    console.log("Email de notification envoye :", sujet);
+  } catch (err) {
+    console.error("Erreur envoi email :", err.message);
+  }
+}
 
 // ---- Modeles ----
 
@@ -48,7 +72,7 @@ const commandeSchema = new mongoose.Schema({
 });
 const Commande = mongoose.model("Commande", commandeSchema);
 
-// ---- Authentification admin (mot de passe simple, un seul admin) ----
+// ---- Authentification admin ----
 
 let adminToken = null;
 
@@ -90,6 +114,12 @@ app.post("/api/rendezvous", async (req, res) => {
 
   try {
     const nouveauRdv = await RendezVous.create({ nom, telephone, service, dateSouhaitee, message });
+
+    envoyerNotification(
+      "Nouveau rendez-vous - YAMBA-TECH",
+      `Nouveau rendez-vous recu :\n\nNom : ${nom}\nTelephone : ${telephone}\nService : ${service || "Non precise"}\nDate souhaitee : ${dateSouhaitee}\nMessage : ${message || "-"}\n\nVoir et gerer ce rendez-vous : ${SITE_URL}/admin`
+    );
+
     res.status(201).json(nouveauRdv);
   } catch (err) {
     res.status(500).json({ erreur: "Erreur lors de la creation du rendez-vous." });
@@ -126,6 +156,13 @@ app.post("/api/commandes", async (req, res) => {
 
   try {
     const nouvelleCommande = await Commande.create({ nom, telephone, articles, total });
+
+    const listeArticles = articles.map((a) => `- ${a.nom} x${a.quantite} (${a.prix.toLocaleString()} FCFA)`).join("\n");
+    envoyerNotification(
+      "Nouvelle commande - YAMBA-TECH",
+      `Nouvelle commande recue :\n\nNom : ${nom}\nTelephone : ${telephone}\n\nArticles :\n${listeArticles}\n\nTotal : ${total.toLocaleString()} FCFA\nPaiement a la livraison / en boutique\n\nVoir et gerer cette commande : ${SITE_URL}/admin`
+    );
+
     res.status(201).json(nouvelleCommande);
   } catch (err) {
     res.status(500).json({ erreur: "Erreur lors de la creation de la commande." });
