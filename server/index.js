@@ -28,7 +28,10 @@ mongoose.connect(process.env.MONGO_URI)
 // ---- Envoi d'email (notifications admin) ----
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  family: 4,
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
@@ -186,3 +189,4 @@ app.patch("/api/commandes/:id", requireAdmin, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Serveur RDV demarre sur le port ${PORT}`);
 });
+
