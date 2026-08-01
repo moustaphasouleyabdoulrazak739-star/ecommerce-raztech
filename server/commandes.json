@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1785552222632,
+    "nom": "Test",
+    "telephone": "90000000",
+    "articles": [
+      {
+        "nom": "Test produit",
+        "prix": 1000,
+        "quantite": 1
+      }
+    ],
+    "total": 1000,
+    "statut": "en attente",
+    "creeLe": "2026-08-01T02:43:42.632Z"
+  },
+  {
+    "id": 1785552473222,
+    "nom": "Moustapha",
+    "telephone": "89476746",
+    "articles": [
+      {
+        "nom": "ThinkPad T470",
+        "prix": 110000,
+        "quantite": 1
+      }
+    ],
+    "total": 110000,
+    "statut": "en attente",
+    "creeLe": "2026-08-01T02:47:53.222Z"
+  }
+]

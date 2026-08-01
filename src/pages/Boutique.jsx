@@ -1,18 +1,8 @@
 import { useState } from "react";
 import ProduitCard from "../components/ProduitCard";
+import { produits } from "../data/produits";
 
-const produits = [
-  { id: 1, nom: "Laptop Pro 15", prix: 450000, categorie: "Informatique", description: "Ordinateur portable haute performance.", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400" },
-  { id: 2, nom: "Smartphone Galaxy", prix: 185000, categorie: "Telephonie", description: "Smartphone Android derniere generation.", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400" },
-  { id: 3, nom: "Casque Bluetooth", prix: 35000, categorie: "Audio", description: "Casque sans fil avec reduction de bruit.", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400" },
-  { id: 4, nom: "Montre Connectee", prix: 75000, categorie: "Accessoires", description: "Smartwatch avec suivi de sante.", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" },
-  { id: 5, nom: "Tablette 10 pouces", prix: 120000, categorie: "Informatique", description: "Tablette Android ideale pour le travail.", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400" },
-  { id: 6, nom: "Ecouteurs Sans Fil", prix: 25000, categorie: "Audio", description: "Ecouteurs True Wireless avec etui de charge.", image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400" },
-  { id: 7, nom: "iPhone 14", prix: 350000, categorie: "Telephonie", description: "Apple iPhone 14 128Go.", image: "https://images.unsplash.com/photo-1664478546384-d57edd2b8e28?w=400" },
-  { id: 8, nom: "Clavier Mecanique", prix: 45000, categorie: "Accessoires", description: "Clavier mecanique RGB pour gaming.", image: "https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=400" },
-];
-
-const categories = ["Tous", "Informatique", "Telephonie", "Audio", "Accessoires"];
+const categories = ["Tous", "Informatique", "Telephonie", "Tablette", "Accessoires"];
 
 function Boutique({ ajouterAuPanier }) {
   const [categorieActive, setCategorieActive] = useState("Tous");
@@ -34,14 +24,14 @@ function Boutique({ ajouterAuPanier }) {
           placeholder="Rechercher un produit..."
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}
-          className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-80 focus:outline-none focus:border-indigo-600"
+          className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-80 focus:outline-none focus:border-yamba-blue"
         />
         <div className="flex gap-2 flex-wrap">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setCategorieActive(cat)}
-              className={cat === categorieActive ? "bg-indigo-600 text-white px-4 py-2 rounded-lg" : "bg-white text-gray-600 border border-gray-300 px-4 py-2 rounded-lg hover:border-indigo-600 transition"}
+              className={cat === categorieActive ? "bg-yamba-blue text-white px-4 py-2 rounded-lg" : "bg-white text-gray-600 border border-gray-300 px-4 py-2 rounded-lg hover:border-yamba-blue transition"}
             >
               {cat}
             </button>

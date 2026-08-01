@@ -6,7 +6,16 @@ export default {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        yamba: {
+          blue: "#2C6E8E",
+          "blue-dark": "#1E4F66",
+          "blue-light": "#4A93B5",
+          dark: "#1F2937",
+        },
+      },
+    },
   },
   plugins: [],
 }

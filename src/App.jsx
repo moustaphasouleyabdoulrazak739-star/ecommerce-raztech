@@ -1,11 +1,22 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Accueil from "./pages/Accueil";
 import Boutique from "./pages/Boutique";
 import Panier from "./pages/Panier";
 import Detail from "./pages/Detail";
+import RendezVous from "./pages/RendezVous";
+import AdminLogin from "./pages/AdminLogin";
+import AdminRendezVous from "./pages/AdminRendezVous";
+import { isLoggedIn } from "./services/adminApi";
 import { useState } from "react";
+
+function RouteProtegee({ children }) {
+  if (!isLoggedIn()) {
+    return <Navigate to="/admin" replace />;
+  }
+  return children;
+}
 
 function App() {
   const [panier, setPanier] = useState([]);
@@ -33,6 +44,16 @@ function App() {
             <Route path="/boutique" element={<Boutique ajouterAuPanier={ajouterAuPanier} />} />
             <Route path="/panier" element={<Panier panier={panier} supprimerDuPanier={supprimerDuPanier} />} />
             <Route path="/produit/:id" element={<Detail ajouterAuPanier={ajouterAuPanier} />} />
+            <Route path="/rendez-vous" element={<RendezVous />} />
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route
+              path="/admin/rendezvous"
+              element={
+                <RouteProtegee>
+                  <AdminRendezVous />
+                </RouteProtegee>
+              }
+            />
           </Routes>
         </main>
         <Footer />
