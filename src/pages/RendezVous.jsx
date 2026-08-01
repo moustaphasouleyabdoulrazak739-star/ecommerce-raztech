@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 function RendezVous() {
   const [formData, setFormData] = useState({
     nom: "",
@@ -21,7 +23,7 @@ function RendezVous() {
     setStatutEnvoi("envoi");
 
     try {
-      const reponse = await fetch("http://localhost:5000/api/rendezvous", {
+      const reponse = await fetch(`${API_URL}/rendezvous`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
