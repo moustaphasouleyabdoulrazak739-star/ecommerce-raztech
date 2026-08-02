@@ -5,7 +5,6 @@ const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
-const nodemailer = require("nodemailer");
 
 if (!process.env.RENDER) {
   const dns = require("dns");
@@ -25,27 +24,29 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connecte a MongoDB Atlas"))
   .catch((err) => console.error("Erreur de connexion MongoDB :", err.message));
 
-// ---- Envoi d'email (notifications admin) ----
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  family: 4,
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+// ---- Envoi d'email via Brevo (API HTTPS, fonctionne meme sur Render gratuit) ----
 
 async function envoyerNotification(sujet, texte) {
   try {
-    await transporter.sendMail({
-      from: `"YAMBA-TECH Site" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,
-      subject: sujet,
-      text: texte,
+    const reponse = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: { name: "YAMBA-TECH Site", email: process.env.GMAIL_USER },
+        to: [{ email: process.env.GMAIL_USER }],
+        subject: sujet,
+        textContent: texte,
+      }),
     });
+
+    if (!reponse.ok) {
+      const erreurData = await reponse.text();
+      throw new Error(`Brevo a repondu ${reponse.status} : ${erreurData}`);
+    }
+
     console.log("Email de notification envoye :", sujet);
   } catch (err) {
     console.error("Erreur envoi email :", err.message);
@@ -189,5 +190,3 @@ app.patch("/api/commandes/:id", requireAdmin, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Serveur RDV demarre sur le port ${PORT}`);
 });
-
-
